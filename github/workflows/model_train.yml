@@ -23,14 +23,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    # RECREATE THE SECRET FILE
-    # This places your real keys into the build_dataset folder so the script finds them
+    
     - name: Recreate the secret file
       run: |
         mkdir -p build_dataset
         echo '${{ secrets.CLIENT_SECRET_DATA }}' > build_dataset/client_secrets.json
 
     - name: Run Model Processing
-      run: |
-        # Replace 'Untitled6.py' with the name of your actual script if you converted the notebook
-        python build_dataset/Untitled6.py
+      run: | 
