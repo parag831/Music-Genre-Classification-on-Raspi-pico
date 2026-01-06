@@ -24,16 +24,14 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install flake8
-        # CHANGE 1: Install libraries your model needs (based on your notebook)
-        pip install tensorflow tensorflow-model-optimization numpy
+        # FIX: Added tf_keras, cmsisdsp, soundfile, scikit-learn, matplotlib, ipython
+        pip install tensorflow tensorflow-model-optimization tf_keras numpy==1.23.5 cmsisdsp==1.9.9 soundfile scikit-learn matplotlib ipython
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         
     - name: Lint with flake8
       run: |
-        # CHANGE 2: Check ONLY model.py instead of the whole folder (.)
         flake8 model_training/model.py --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 model_training/model.py --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
         
     - name: Run Model Check
-      # CHANGE 3: Run the script directly instead of looking for tests (pytest)
       run: python model_training/model.py
