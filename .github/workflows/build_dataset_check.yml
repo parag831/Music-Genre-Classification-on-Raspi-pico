@@ -1,9 +1,11 @@
 name: Data Collection Code Quality Check
 
 on:
+  workflow_dispatch:
+  
   push:
     paths:
-      - 'build_dataset/**' 
+      - 'build_dataset/**'
   pull_request:
     branches: [ "main" ]
 
