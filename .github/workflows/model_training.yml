@@ -12,8 +12,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     
-    # CRITICAL FIX: This environment variable tells TensorFlow to use the 
-    # installed 'tf_keras' package (Legacy Keras 2) instead of Keras 3.
+    # 1. This tells TensorFlow to look for the 'tf_keras' package
     env:
       TF_USE_LEGACY_KERAS: '1'
 
@@ -30,13 +29,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8
         
-        # STRATEGY CHANGE: Instead of downgrading TF, we install latest TF + tf_keras
-        # 1. tensorflow (Latest, e.g., 2.16/2.17)
-        # 2. tf_keras (The legacy Keras library required by model_optimization)
-        # 3. numpy pinned to 1.26.4 (Required for compatibility with newer TF)
+        # 2. FIX: We MUST install 'tf_keras' alongside tensorflow for the env var to work
+        # We also pin numpy to 1.26.4 to ensure compatibility with TF 2.16+
         pip install tensorflow tf_keras tensorflow-model-optimization "numpy==1.26.4" 
         
-        # Other dependencies
+        # Install other dependencies
         pip install cmsisdsp==1.9.9 soundfile scikit-learn matplotlib ipython
         
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
