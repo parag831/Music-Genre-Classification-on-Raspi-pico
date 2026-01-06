@@ -1,8 +1,8 @@
-!pip install tensorflow-model-optimization
+#pip install tensorflow-model-optimization
 import tensorflow_model_optimization as tfmot
 
-!pip install numpy==1.23.5
-!pip install cmsisdsp==1.9.9
+#pip install numpy==1.23.5
+#pip install cmsisdsp==1.9.9
 
 SAMPLE_RATE = 22050
 FRAME_LENGTH = 2048
@@ -12,19 +12,38 @@ FMIN_HZ = 20
 FMAX_HZ = SAMPLE_RATE / 2
 NUM_MEL_FREQS = 40
 NUM_MFCCS = 18
+TRAIN_AUDIO_LENGTH_SAMPLE = 22050
 
-from google.colab import drive
+import numpy as np
 import soundfile as sf
-drive.mount('/content/drive/')
 
-train_dir = "/content/drive/My Drive/mgr_dataset"
+# Create dummy data instead of loading from Drive
+print("Generating dummy data for CI/CD build...")
+x = np.random.rand(100, 20, 18).astype(np.float32) # 100 samples, 20 frames, 18 MFCCs
+y = np.random.randint(0, 3, 100) # 100 random labels (0, 1, or 2)
 
-file_path = train_dir+'/disco/disco.00002.wav'
 
-ad,sr = sf.read(file_path)
 
+
+#from google.colab import drive
+#import soundfile as sf
+#drive.mount('/content/drive/')
+
+#train_dir = "/content/drive/My Drive/mgr_dataset"
+#file_path = train_dir+'/disco/disco.00002.wav'
+
+#ad,sr = sf.read(file_path)
+
+#SAMPLE_RATE = 22050
+#test_ad = ad[0:SAMPLE_RATE]
+
+# MOCK DATA: Generate random audio noise for testing
+print("Generating dummy audio sample...")
 SAMPLE_RATE = 22050
-test_ad = ad[0:SAMPLE_RATE]
+# Create 1 second of random noise (simulating 'test_ad')
+test_ad = np.random.uniform(-1.0, 1.0, SAMPLE_RATE).astype(np.float32)
+sr = SAMPLE_RATE
+
 
 import numpy as np
 import tensorflow as tf
@@ -218,27 +237,26 @@ import os
 x=[]
 y=[]
 LIST_GENRES =['disco','jazz','metal']
-for genre in LIST_GENRES :
-  folder = train_dir + '/' + genre
-  list_files = os.listdir(folder)
-  for song in list_files:
-    file_path = folder + '/' + song
-    try :
-      ad , sr = sf.read(file_path)
-      TRAIN_AUDIO_LENGTH_SAMPLE = 22050
+#for genre in LIST_GENRES :
+#  folder = train_dir + '/' + genre
+#  list_files = os.listdir(folder)
+#  for song in list_files:
+#    file_path = folder + '/' + song
+#    try :
+#      ad , sr = sf.read(file_path)
+#      TRAIN_AUDIO_LENGTH_SAMPLE = 22050
 
-      num_it = int(len(ad)/TRAIN_AUDIO_LENGTH_SAMPLE)
-      for i in range(num_it) :
-        s0 = i * TRAIN_AUDIO_LENGTH_SAMPLE
-        s1 = s0 + TRAIN_AUDIO_LENGTH_SAMPLE
-        src_audio = ad[s0:s1]
-        mfccs = extract_mfccs_cmsis(src_audio,NUM_MFCCS,FRAME_LENGTH,FRAME_STEP,hann_lut_q15,mel_wei_mtx_q15,log_lut_q13_3,dct_wei_mtx_q15)
-        x.append(mfccs.tolist())
-        y.append(LIST_GENRES.index(genre))
+#      num_it = int(len(ad)/TRAIN_AUDIO_LENGTH_SAMPLE)
+#      for i in range(num_it) :
+#        s0 = i * TRAIN_AUDIO_LENGTH_SAMPLE
+#      s1 = s0 + TRAIN_AUDIO_LENGTH_SAMPLE
+#        src_audio = ad[s0:s1]
+#        mfccs = extract_mfccs_cmsis(src_audio,NUM_MFCCS,FRAME_LENGTH,FRAME_STEP,hann_lut_q15,mel_wei_mtx_q15,log_lut_q13_3,dct_wei_mtx_q15)
+#        x.append(mfccs.tolist())
+#        y.append(LIST_GENRES.index(genre))
 
-    except Exception as e:
-          continue
-
+#    except Exception as e:
+#          continue
 x,y=np.array(x),np.array(y)
 
 #LSTM32_32
@@ -411,9 +429,33 @@ TFL_MODEL_FILE = 'model.tflite'
 with open(TFL_MODEL_FILE, "wb") as f:
     f.write(tflite_model)
 
-!xxd -i $TFL_MODEL_FILE > model.h
-!sed -i 's/unsigned char/const unsigned char/g' model.h
-!sed -i 's/const/alignas(8) const/g' model.h
+#xxd -i $TFL_MODEL_FILE > model.h
+#sed -i 's/unsigned char/const unsigned char/g' model.h
+#sed -i 's/const/alignas(8) const/g' model.h
+
+# Python replacement for xxd and sed
+def convert_to_header(tflite_path, header_path):
+    with open(tflite_path, 'rb') as f:
+        data = f.read()
+    
+    hex_str = ", ".join([f"0x{b:02x}" for b in data])
+    header_content = f"""
+#ifndef MODEL_H
+#define MODEL_H
+
+#include <stdint.h>
+
+alignas(8) const unsigned char model_data[] = {{ {hex_str} }};
+const unsigned int model_data_len = {len(data)};
+
+#endif
+"""
+    with open(header_path, 'w') as f:
+        f.write(header_content)
+
+convert_to_header(TFL_MODEL_FILE, "model.h")
+
+
 def to_c_array(data, c_type, filename, num_cols = 12):
 
   def to_numpy_dt(dtype):
