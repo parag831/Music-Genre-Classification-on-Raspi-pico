@@ -11,37 +11,55 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    # 1. This tells TensorFlow to switch to the legacy backend
+
+    # 1. MIMIC COLAB ENVIRONMENT VARIABLE
+    # This forces TensorFlow to look for the legacy 'tf_keras' package, just like Colab does.
     env:
       TF_USE_LEGACY_KERAS: '1'
 
     steps:
     - uses: actions/checkout@v4
-    
-    - name: Set up Python 3.10
+
+    - name: Set up Python 3.12
+      # Updated to 3.12 to strictly match your Colab logs (/usr/local/lib/python3.12/...)
       uses: actions/setup-python@v3
       with:
-        python-version: "3.10"
-        
+        python-version: "3.12"
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install flake8
+
+        # 2. EXACT COLAB DEPENDENCY REPLICATION
+        # These versions are pulled directly from your 'Untitled6.ipynb' logs:
         
-        # 2. CRITICAL FIX: You MUST install 'tf_keras' here. 
-        # Without this package, the environment variable above causes a crash.
-        pip install tensorflow tf_keras tensorflow-model-optimization "numpy==1.26.4" 
+        # Core Framework (Pre-installed in Colab, manual here)
+        pip install "tensorflow==2.17.0"
         
-        # Install other dependencies
+        # The 'Hidden' Dependency (Pre-installed in Colab, CRITICAL missing piece here)
+        pip install "tf_keras==2.17.0"
+        
+        # Optimization Tools (The one you explicitly pip installed)
+        pip install "tensorflow-model-optimization==0.8.0"
+        
+        # Numpy (Pinned to match the version Colab downgraded to in your logs)
+        # Note: Your logs showed Numpy 2.0.2 caused conflicts, so we stick to 1.26.4
+        pip install "numpy==1.26.4"
+        
+        # Supporting libraries found in your logs/requirements
+        pip install "absl-py==1.4.0" "dm-tree==0.1.9" "wrapt==2.0.1" "six==1.17.0"
+
+        # 3. YOUR PROJECT SPECIFIC DEPENDENCIES
+        # These are needed for your specific 'model.py' script to run
         pip install cmsisdsp==1.9.9 soundfile scikit-learn matplotlib ipython
-        
+
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        
+
     - name: Lint with flake8
       run: |
         flake8 model_training/model.py --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 model_training/model.py --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-        
+
     - name: Run Model Check
       run: python model_training/model.py
