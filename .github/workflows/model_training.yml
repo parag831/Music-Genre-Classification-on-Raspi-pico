@@ -37,4 +37,4 @@ jobs:
         
     - name: Run Model Check
       # CHANGE 3: Run the script directly instead of looking for tests (pytest)
-      run: model_training/python model.py
+      run: python model_training/model.py
