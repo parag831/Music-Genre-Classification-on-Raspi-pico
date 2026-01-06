@@ -234,8 +234,8 @@ abs_diff = np.abs(mfccs_tf - mfccs_cmsis)
 display_mfccs(abs_diff.T)
 
 import os
-x=[]
-y=[]
+#x=[]
+#y=[]
 LIST_GENRES =['disco','jazz','metal']
 #for genre in LIST_GENRES :
 #  folder = train_dir + '/' + genre
