@@ -282,7 +282,7 @@ X_test = (X_test - train_mean) / train_std
 input_shape = (X_train.shape[1], X_train.shape[2])
 
 model_LSTM32_32 = Sequential()
-model_LSTM32_32.add(layers.InputLayer(shape=input_shape))
+model_LSTM32_32.add(layers.InputLayer(input_shape=input_shape))
 model_LSTM32_32.add(layers.LSTM(128, return_sequences=True,unroll=True))
 model_LSTM32_32.add(layers.LSTM(64,return_sequences=False,unroll=True))
 model_LSTM32_32.add(layers.Dropout(0.5))
