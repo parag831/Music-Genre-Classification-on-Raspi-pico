@@ -1,0 +1,36 @@
+name: Data Collection Code Quality Check
+
+on:
+  push:
+    paths:
+      - 'build_dataset/**' 
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsndfile1
+
+    - name: Install Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8
+        pip install pyserial soundfile numpy pydrive
+
+    - name: Run Syntax Check (Linting)
+      run: |
+        flake8 build_dataset/build_dataset.py --count --select=E9,F63,F7,F82 --show-source --statistics
