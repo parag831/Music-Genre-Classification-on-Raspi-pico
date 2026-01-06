@@ -24,8 +24,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install flake8
-        # FIX: Added tf_keras, cmsisdsp, soundfile, scikit-learn, matplotlib, ipython
-        pip install tensorflow tensorflow-model-optimization tf_keras numpy==1.23.5 cmsisdsp==1.9.9 soundfile scikit-learn matplotlib ipython
+        # FIX: Downgrade to TF 2.15.0 to avoid Keras 3 converter crashes
+        # Note: tf_keras is REMOVED because TF 2.15 includes Keras natively
+        pip install tensorflow==2.15.0 tensorflow-model-optimization numpy==1.23.5 cmsisdsp==1.9.9 soundfile scikit-learn matplotlib ipython
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         
     - name: Lint with flake8
