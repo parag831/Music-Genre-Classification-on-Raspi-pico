@@ -1,0 +1,27 @@
+name: Mic Setup Check
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: arduino/setup-arduino-cli@v1
+      with:
+        version: "0.34.0"
+
+    - name: Install Core & Libs
+      run: |
+        arduino-cli config init
+        arduino-cli core update-index
+        arduino-cli core install arduino:mbed_rp2040
+        arduino-cli lib install "Arduino_CMSIS-DSP"
+
+    - name: Compile
+      run: |
+        # CHECK BELOW: Update './your_sketch_folder' to the folder containing your .ino file
+        arduino-cli compile --fqbn arduino:mbed_rp2040:pico --warnings all ./mic_setup/mic_setup
