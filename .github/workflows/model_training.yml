@@ -1,4 +1,4 @@
-name: model
+name: Model check
 
 on:
   push:
