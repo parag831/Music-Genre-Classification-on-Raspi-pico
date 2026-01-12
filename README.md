@@ -18,7 +18,7 @@ DIRECTORY STRUCTURE
 
 
 ================================================================================
-PART 1: HARDWARE SETUP & DATASET GENERATION (~20%)
+PART 1: HARDWARE SETUP & DATASET GENERATION
 Folders: /micsetup, /build_dataset
 ================================================================================
 
@@ -43,7 +43,7 @@ custom dataset builder was created.
 
 
 ================================================================================
-PART 2: MODEL ARCHITECTURE & TRAINING PIPELINE (~60%)
+PART 2: MODEL ARCHITECTURE & TRAINING PIPELINE 
 Folder: /model_training
 ================================================================================
 
@@ -111,7 +111,7 @@ To fit the model onto the microcontroller, we perform Post-Training Quantization
 
 
 ================================================================================
-PART 3: EMBEDDED FIRMWARE & INFERENCE (~20%)
+PART 3: EMBEDDED FIRMWARE & INFERENCE 
 Folder: /music_genre_classification_1
 ================================================================================
 
